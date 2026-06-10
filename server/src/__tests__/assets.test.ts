@@ -138,7 +138,6 @@ describe("POST /api/companies/:companyId/assets/images", () => {
     vi.resetModules();
     vi.doUnmock("../services/activity-log.js");
     vi.doUnmock("../services/assets.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/assets.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");
@@ -200,7 +199,6 @@ describe("POST /api/companies/:companyId/assets/images", () => {
 describe("POST /api/companies/:companyId/logo", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/assets.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

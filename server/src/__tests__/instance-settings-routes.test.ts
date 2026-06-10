@@ -37,7 +37,6 @@ async function createApp(actor: any) {
 describe("instance settings routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/instance-settings.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

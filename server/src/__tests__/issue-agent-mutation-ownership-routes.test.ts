@@ -231,7 +231,6 @@ describe("agent issue mutation checkout ownership", () => {
     vi.doUnmock("../services/activity-log.js");
     vi.doUnmock("../services/agents.js");
     vi.doUnmock("../services/documents.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../services/issues.js");
     vi.doUnmock("../services/work-products.js");
     vi.doUnmock("../routes/issues.js");

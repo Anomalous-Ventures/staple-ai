@@ -135,7 +135,6 @@ async function loadCostParsers() {
 
 beforeEach(() => {
   vi.resetModules();
-  vi.doUnmock("../services/index.js");
   vi.doUnmock("../services/quota-windows.js");
   vi.doUnmock("../routes/costs.js");
   vi.doUnmock("../middleware/index.js");

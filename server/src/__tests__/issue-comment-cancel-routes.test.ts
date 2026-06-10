@@ -168,7 +168,6 @@ describe.sequential("issue comment cancel routes", () => {
     vi.doUnmock("../services/activity-log.js");
     vi.doUnmock("../services/feedback.js");
     vi.doUnmock("../services/heartbeat.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../services/instance-settings.js");
     vi.doUnmock("../services/issues.js");
     vi.doUnmock("../routes/issues.js");

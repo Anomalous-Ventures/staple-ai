@@ -116,8 +116,8 @@ function registerModuleMocks() {
 
 async function createApp(actor: Record<string, unknown>) {
   const [{ errorHandler }, { routineRoutes }] = await Promise.all([
-    vi.importActual<typeof import("../middleware/index.js")>("../middleware/index.js"),
-    vi.importActual<typeof import("../routes/routines.js")>("../routes/routines.js"),
+    import("../middleware/index.js"),
+    import("../routes/routines.js"),
   ]);
   const app = express();
   app.use(express.json());
@@ -133,12 +133,6 @@ async function createApp(actor: Record<string, unknown>) {
 describe("routine routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("@stapleai/shared/telemetry");
-    vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/access.js");
-    vi.doUnmock("../services/index.js");
-    vi.doUnmock("../services/activity-log.js");
-    vi.doUnmock("../services/routines.js");
     vi.doUnmock("../routes/routines.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

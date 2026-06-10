@@ -1,4 +1,6 @@
 import express from "express";
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ServerAdapterModule } from "../adapters/index.js";
@@ -85,6 +87,7 @@ function registerRouteMocks() {
 
 const EXTERNAL_ADAPTER_TYPE = "external_admin_test";
 const EXTERNAL_PACKAGE_NAME = "staple-external-adapter";
+const ADAPTER_PLUGINS_DIR = "/tmp/staple-adapter-route-authz-test";
 let adapterRoutes: typeof import("../routes/adapters.js").adapterRoutes;
 let errorHandler: typeof import("../middleware/index.js").errorHandler;
 let registerServerAdapter: typeof import("../adapters/registry.js").registerServerAdapter;
@@ -111,6 +114,39 @@ function installedRecord(type = EXTERNAL_ADAPTER_TYPE) {
     type,
     installedAt: new Date(0).toISOString(),
   };
+}
+
+function seedExternalAdapterPackage(type = EXTERNAL_ADAPTER_TYPE) {
+  const packageDir = path.join(ADAPTER_PLUGINS_DIR, "node_modules", EXTERNAL_PACKAGE_NAME);
+  mkdirSync(packageDir, { recursive: true });
+  writeFileSync(
+    path.join(packageDir, "package.json"),
+    JSON.stringify({
+      name: EXTERNAL_PACKAGE_NAME,
+      version: "0.0.0-test",
+      type: "module",
+      exports: {
+        ".": "./index.js",
+      },
+    }),
+  );
+  writeFileSync(
+    path.join(packageDir, "index.js"),
+    `export function createServerAdapter() {
+  return {
+    type: ${JSON.stringify(type)},
+    models: [],
+    execute: async () => ({ exitCode: 0, signal: null, timedOut: false }),
+    testEnvironment: async () => ({
+      adapterType: ${JSON.stringify(type)},
+      status: "pass",
+      checks: [],
+      testedAt: new Date(0).toISOString(),
+    }),
+  };
+}
+`,
+  );
 }
 
 function createApp(actor: Express.Request["actor"]) {
@@ -247,11 +283,20 @@ describe.sequential("adapter management route authorization", () => {
     vi.doUnmock("../adapters/registry.js");
     registerRouteMocks();
     vi.doMock("../routes/authz.js", async () => vi.importActual("../routes/authz.js"));
+    mocks.externalRecords.clear();
+    mocks.listAdapterPlugins.mockImplementation(() => [...mocks.externalRecords.values()]);
+    mocks.getAdapterPluginsDir.mockReturnValue(ADAPTER_PLUGINS_DIR);
+    mocks.getDisabledAdapterTypes.mockReturnValue([]);
+    mocks.setAdapterDisabled.mockReturnValue(true);
+    mocks.buildExternalAdapters.mockResolvedValue([]);
+    mocks.loadExternalAdapterPackage.mockResolvedValue(createAdapter());
+    mocks.reloadExternalAdapter.mockImplementation(async (type: string) => createAdapter(type));
+    seedExternalAdapterPackage();
 
     const [routes, middleware, registry] = await Promise.all([
-      vi.importActual<typeof import("../routes/adapters.js")>("../routes/adapters.js"),
+      import("../routes/adapters.js"),
       vi.importActual<typeof import("../middleware/index.js")>("../middleware/index.js"),
-      vi.importActual<typeof import("../adapters/registry.js")>("../adapters/registry.js"),
+      import("../adapters/registry.js"),
     ]);
     adapterRoutes = routes.adapterRoutes;
     errorHandler = middleware.errorHandler;
@@ -264,12 +309,13 @@ describe.sequential("adapter management route authorization", () => {
     unregisterServerAdapter(EXTERNAL_ADAPTER_TYPE);
     setOverridePaused("claude_local", false);
     mocks.listAdapterPlugins.mockImplementation(() => [...mocks.externalRecords.values()]);
-    mocks.getAdapterPluginsDir.mockReturnValue("/tmp/staple-adapter-route-authz-test");
+    mocks.getAdapterPluginsDir.mockReturnValue(ADAPTER_PLUGINS_DIR);
     mocks.getDisabledAdapterTypes.mockReturnValue([]);
     mocks.setAdapterDisabled.mockReturnValue(true);
     mocks.buildExternalAdapters.mockResolvedValue([]);
     mocks.loadExternalAdapterPackage.mockResolvedValue(createAdapter());
     mocks.reloadExternalAdapter.mockImplementation(async (type: string) => createAdapter(type));
+    seedExternalAdapterPackage();
   }, 20_000);
 
   afterEach(() => {

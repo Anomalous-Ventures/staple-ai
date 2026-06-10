@@ -41,7 +41,6 @@ const ORDERED_IDS = [
 describe("sidebar preference routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/sidebar-preferences.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

@@ -134,13 +134,6 @@ async function createApp(actor: Record<string, unknown>) {
 describe("issue feedback trace routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("@stapleai/shared/telemetry");
-    vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/index.js");
-    vi.doUnmock("../services/environments.js");
-    vi.doUnmock("../services/execution-workspaces.js");
-    vi.doUnmock("../services/feedback.js");
-    vi.doUnmock("../services/instance-settings.js");
     vi.doUnmock("../routes/issues.js");
     vi.doUnmock("../middleware/index.js");
     registerModuleMocks();

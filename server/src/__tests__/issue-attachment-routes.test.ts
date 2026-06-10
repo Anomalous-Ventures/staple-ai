@@ -172,7 +172,6 @@ describe("issue attachment routes", () => {
     vi.doUnmock("@stapleai/shared/telemetry");
     vi.doUnmock("../telemetry.js");
     vi.doUnmock("../services/issues.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../services/activity-log.js");
     vi.doUnmock("../routes/issues.js");
     vi.doUnmock("../routes/authz.js");
