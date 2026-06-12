@@ -102,7 +102,6 @@ describe("project and goal telemetry routes", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../services/workspace-runtime.js");
     vi.doUnmock("../routes/projects.js");
     vi.doUnmock("../routes/goals.js");

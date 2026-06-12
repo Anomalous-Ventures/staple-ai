@@ -108,7 +108,6 @@ async function createApp() {
 describe("POST /companies/:companyId/invites", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/access.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

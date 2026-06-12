@@ -99,7 +99,6 @@ describe("issue telemetry routes", () => {
     vi.resetModules();
     vi.doUnmock("@stapleai/shared/telemetry");
     vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../routes/issues.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

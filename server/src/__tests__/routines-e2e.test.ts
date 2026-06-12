@@ -5,6 +5,7 @@ import request from "supertest";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   activityLog,
+  agentRuntimeState,
   agentWakeupRequests,
   agents,
   companies,
@@ -27,6 +28,7 @@ import {
   startEmbeddedPostgresTestDatabase,
 } from "./helpers/embedded-postgres.js";
 import { accessService } from "../services/access.js";
+import { instanceSettingsService } from "../services/instance-settings.js";
 
 function registerRoutineServiceMock() {
   vi.doMock("../services/routines.js", async () => {
@@ -101,6 +103,7 @@ describeEmbeddedPostgres("routine routes end-to-end", () => {
     await db.delete(heartbeatRunEvents);
     await db.delete(heartbeatRuns);
     await db.delete(agentWakeupRequests);
+    await db.delete(agentRuntimeState);
     await db.delete(issues);
     await db.delete(executionWorkspaces);
     await db.delete(projectWorkspaces);
@@ -459,9 +462,7 @@ describeEmbeddedPostgres("routine routes end-to-end", () => {
         },
       })
       .where(eq(projects.id, projectId));
-    await db.insert(instanceSettings).values({
-      experimental: { enableIsolatedWorkspaces: true },
-    });
+    await instanceSettingsService(db).updateExperimental({ enableIsolatedWorkspaces: true });
 
     const createRes = await request(app)
       .post(`/api/companies/${companyId}/routines`)

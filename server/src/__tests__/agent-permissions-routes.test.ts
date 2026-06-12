@@ -262,28 +262,10 @@ async function requestApp(
 describe.sequential("agent permission routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("@stapleai/shared/telemetry");
-    vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/access.js");
-    vi.doUnmock("../services/activity-log.js");
-    vi.doUnmock("../services/agent-instructions.js");
-    vi.doUnmock("../services/agents.js");
-    vi.doUnmock("../services/approvals.js");
-    vi.doUnmock("../services/budgets.js");
-    vi.doUnmock("../services/company-skills.js");
-    vi.doUnmock("../services/heartbeat.js");
-    vi.doUnmock("../services/index.js");
-    vi.doUnmock("../services/instance-settings.js");
-    vi.doUnmock("../services/issue-approvals.js");
-    vi.doUnmock("../services/issues.js");
-    vi.doUnmock("../services/secrets.js");
-    vi.doUnmock("../services/environments.js");
-    vi.doUnmock("../services/workspace-operations.js");
     vi.doUnmock("../adapters/index.js");
     vi.doUnmock("../routes/agents.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");
-    vi.doUnmock("@stapleai/adapter-opencode-local/server");
     registerModuleMocks();
     vi.resetAllMocks();
     mockAgentService.getById.mockReset();

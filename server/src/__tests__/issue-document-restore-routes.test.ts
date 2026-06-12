@@ -170,7 +170,6 @@ describe("issue document revision routes", () => {
     vi.doUnmock("../services/documents.js");
     vi.doUnmock("../services/heartbeat.js");
     vi.doUnmock("../services/routines.js");
-    vi.doUnmock("../services/index.js");
     vi.doUnmock("../services/instance-settings.js");
     vi.doUnmock("../services/issues.js");
     vi.doUnmock("../routes/issues.js");

@@ -176,15 +176,6 @@ function makeClosedWorkspace() {
 describe.sequential("closed isolated workspace issue routes", () => {
   beforeEach(() => {
     vi.resetModules();
-    vi.doUnmock("@stapleai/shared/telemetry");
-    vi.doUnmock("../telemetry.js");
-    vi.doUnmock("../services/access.js");
-    vi.doUnmock("../services/activity-log.js");
-    vi.doUnmock("../services/execution-workspaces.js");
-    vi.doUnmock("../services/heartbeat.js");
-    vi.doUnmock("../services/index.js");
-    vi.doUnmock("../services/issues.js");
-    vi.doUnmock("../services/projects.js");
     vi.doUnmock("../routes/issues.js");
     vi.doUnmock("../routes/authz.js");
     vi.doUnmock("../middleware/index.js");

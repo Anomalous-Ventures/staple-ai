@@ -1,4 +1,6 @@
 import express from "express";
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
 import request from "supertest";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { vi } from "vitest";
@@ -49,6 +51,7 @@ let findServerAdapter: typeof import("../adapters/registry.js").findServerAdapte
 let setOverridePaused: typeof import("../adapters/registry.js").setOverridePaused;
 let adapterRoutes: typeof import("../routes/adapters.js").adapterRoutes;
 let errorHandler: typeof import("../middleware/index.js").errorHandler;
+const HOT_INSTALL_PACKAGE_DIR = "/tmp/fake-hot-install-adapter";
 
 function registerModuleMocks() {
   vi.doMock("node:child_process", async () => vi.importActual("node:child_process"));
@@ -76,6 +79,38 @@ function createApp(actorOverrides: Partial<Express.Request["actor"]> = {}) {
   app.use("/api", adapterRoutes());
   app.use(errorHandler);
   return app;
+}
+
+function seedLocalAdapterPackage(type: string, sessionManagement: Record<string, unknown>) {
+  mkdirSync(HOT_INSTALL_PACKAGE_DIR, { recursive: true });
+  writeFileSync(
+    path.join(HOT_INSTALL_PACKAGE_DIR, "package.json"),
+    JSON.stringify({
+      name: "fake-hot-install-adapter",
+      version: "0.0.0-test",
+      type: "module",
+      exports: {
+        ".": "./index.js",
+      },
+    }),
+  );
+  writeFileSync(
+    path.join(HOT_INSTALL_PACKAGE_DIR, "index.js"),
+    `export function createServerAdapter() {
+  return {
+    type: ${JSON.stringify(type)},
+    execute: async () => ({ exitCode: 0, signal: null, timedOut: false }),
+    testEnvironment: async () => ({
+      adapterType: ${JSON.stringify(type)},
+      status: "pass",
+      checks: [],
+      testedAt: new Date(0).toISOString(),
+    }),
+    sessionManagement: ${JSON.stringify(sessionManagement)},
+  };
+}
+`,
+  );
 }
 
 describe("adapter routes", () => {
@@ -262,12 +297,13 @@ describe("adapter routes", () => {
       }),
       sessionManagement: declaredSessionManagement,
     };
+    seedLocalAdapterPackage(HOT_INSTALL_TYPE, declaredSessionManagement);
     mockPluginLoader.loadExternalAdapterPackage.mockResolvedValue(externalModule);
 
     const app = createApp({ isInstanceAdmin: true });
     const res = await request(app)
       .post("/api/adapters/install")
-      .send({ packageName: "/tmp/fake-hot-install-adapter", isLocalPath: true });
+      .send({ packageName: HOT_INSTALL_PACKAGE_DIR, isLocalPath: true });
 
     expect(res.status, JSON.stringify(res.body)).toBe(201);
     expect(res.body.type).toBe(HOT_INSTALL_TYPE);
