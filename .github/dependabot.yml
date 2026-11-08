@@ -1,0 +1,97 @@
+version: 2
+updates:
+- package-ecosystem: docker
+  directories:
+  - /
+  - /docker
+  - /docker/openclaw-smoke
+  - /docker/untrusted-review
+  multi-ecosystem-group: weekly-patches
+  patterns:
+  - '*'
+  ignore:
+  - dependency-name: '*'
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  allow:
+  - dependency-type: direct
+    update-types:
+    - version-update:semver-patch
+- package-ecosystem: docker-compose
+  directory: /docker
+  multi-ecosystem-group: weekly-patches
+  patterns:
+  - '*'
+  ignore:
+  - dependency-name: '*'
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  allow:
+  - dependency-type: direct
+    update-types:
+    - version-update:semver-patch
+- package-ecosystem: github-actions
+  directory: /
+  multi-ecosystem-group: weekly-patches
+  patterns:
+  - '*'
+  ignore:
+  - dependency-name: '*'
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  allow:
+  - dependency-type: direct
+    update-types:
+    - version-update:semver-patch
+- package-ecosystem: npm
+  directories:
+  - /
+  - /cli
+  - /packages/adapter-utils
+  - /packages/adapters/claude-local
+  - /packages/adapters/codex-local
+  - /packages/adapters/cursor-local
+  - /packages/adapters/devcontroller-gateway
+  - /packages/adapters/gemini-local
+  - /packages/adapters/libai-local
+  - /packages/adapters/openclaw-gateway
+  - /packages/adapters/opencode-local
+  - /packages/adapters/pi-local
+  - /packages/adapters/stax-orchestrator
+  - /packages/db
+  - /packages/mcp-server
+  - /packages/plugins/create-staple-plugin
+  - /packages/plugins/examples/plugin-authoring-smoke-example
+  - /packages/plugins/examples/plugin-file-browser-example
+  - /packages/plugins/examples/plugin-hello-world-example
+  - /packages/plugins/examples/plugin-kitchen-sink-example
+  - /packages/plugins/examples/plugin-orchestration-smoke-example
+  - /packages/plugins/sandbox-providers/e2b
+  - /packages/plugins/sdk
+  - /packages/plugins/staple-plugin-fake-sandbox
+  - /packages/shared
+  - /server
+  - /ui
+  multi-ecosystem-group: weekly-patches
+  patterns:
+  - '*'
+  ignore:
+  - dependency-name: '*'
+    update-types:
+    - version-update:semver-major
+    - version-update:semver-minor
+  allow:
+  - dependency-type: direct
+    update-types:
+    - version-update:semver-patch
+multi-ecosystem-groups:
+  weekly-patches:
+    schedule:
+      interval: weekly
+      day: monday
+      time: 09:00
+      timezone: America/Los_Angeles
+    open-pull-requests-limit: 1
