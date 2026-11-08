@@ -293,11 +293,10 @@ describe.sequential("adapter management route authorization", () => {
     mocks.reloadExternalAdapter.mockImplementation(async (type: string) => createAdapter(type));
     seedExternalAdapterPackage();
 
-    const [routes, middleware, registry] = await Promise.all([
-      import("../routes/adapters.js"),
-      vi.importActual<typeof import("../middleware/index.js")>("../middleware/index.js"),
-      import("../adapters/registry.js"),
-    ]);
+    // Settle the mocked route graph before loading the real middleware graph.
+    const routes = await import("../routes/adapters.js");
+    const middleware = await vi.importActual<typeof import("../middleware/index.js")>("../middleware/index.js");
+    const registry = await import("../adapters/registry.js");
     adapterRoutes = routes.adapterRoutes;
     errorHandler = middleware.errorHandler;
     registerServerAdapter = registry.registerServerAdapter;
