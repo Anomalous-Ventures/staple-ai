@@ -1,8 +1,9 @@
 import express from "express";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import request from "supertest";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ServerAdapterModule } from "../adapters/index.js";
 
 const mocks = vi.hoisted(() => {
@@ -87,7 +88,8 @@ function registerRouteMocks() {
 
 const EXTERNAL_ADAPTER_TYPE = "external_admin_test";
 const EXTERNAL_PACKAGE_NAME = "staple-external-adapter";
-const ADAPTER_PLUGINS_DIR = "/tmp/staple-adapter-route-authz-test";
+const ADAPTER_TEST_HOME = mkdtempSync(path.join(os.tmpdir(), "staple-adapter-route-authz-"));
+const ADAPTER_PLUGINS_DIR = path.join(ADAPTER_TEST_HOME, "adapter-plugins");
 let adapterRoutes: typeof import("../routes/adapters.js").adapterRoutes;
 let errorHandler: typeof import("../middleware/index.js").errorHandler;
 let registerServerAdapter: typeof import("../adapters/registry.js").registerServerAdapter;
@@ -273,6 +275,7 @@ function resetInstalledExternalAdapterState() {
 
 describe.sequential("adapter management route authorization", () => {
   beforeEach(async () => {
+    vi.stubEnv("STAPLE_HOME", ADAPTER_TEST_HOME);
     vi.resetModules();
     vi.doUnmock("node:child_process");
     vi.doUnmock("../services/adapter-plugin-store.js");
@@ -316,11 +319,21 @@ describe.sequential("adapter management route authorization", () => {
     mocks.loadExternalAdapterPackage.mockResolvedValue(createAdapter());
     mocks.reloadExternalAdapter.mockImplementation(async (type: string) => createAdapter(type));
     seedExternalAdapterPackage();
+
+    const actualStore = await vi.importActual<typeof import("../services/adapter-plugin-store.js")>(
+      "../services/adapter-plugin-store.js",
+    );
+    expect(actualStore.getAdapterPluginsDir()).toBe(ADAPTER_PLUGINS_DIR);
   }, 20_000);
 
   afterEach(() => {
     unregisterServerAdapter(EXTERNAL_ADAPTER_TYPE);
     setOverridePaused("claude_local", false);
+    vi.unstubAllEnvs();
+  });
+
+  afterAll(() => {
+    rmSync(ADAPTER_TEST_HOME, { recursive: true, force: true });
   });
 
   it("rejects mutating adapter routes for a non-instance-admin board user with company membership", async () => {
