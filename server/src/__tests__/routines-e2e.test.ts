@@ -10,6 +10,7 @@ import {
   agents,
   companies,
   companyMemberships,
+  companySkills,
   createDb,
   executionWorkspaces,
   heartbeatRunEvents,
@@ -112,6 +113,7 @@ describeEmbeddedPostgres("routine routes end-to-end", () => {
     await db.delete(routines);
     await db.delete(projects);
     await db.delete(agents);
+    await db.delete(companySkills);
     await db.delete(companies);
     await db.delete(instanceSettings);
   });
